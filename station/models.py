@@ -26,12 +26,6 @@ class TrainModel(models.Model):
     class Meta:
         db_table = "train"
         ordering = ["name"]
-        constraints = [
-            UniqueConstraint(
-                fields=["cargo_num", "places_in_cargo"],
-                name="unique_cargo_num_places_in_cargo",
-            )
-        ]
 
     def __str__(self):
         return self.name
@@ -130,6 +124,12 @@ class TicketModel(models.Model):
 
     class Meta:
         db_table = "ticket"
+        constraints = [
+            UniqueConstraint(
+                fields=["cargo", "seat"],
+                name="unique_cargo_seat",
+            )
+        ]
 
     def __str__(self):
         return f"Order:{self.order.id}, cargo: {self.cargo}, seat: {self.seat}"
