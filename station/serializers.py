@@ -104,6 +104,7 @@ class JourneyDetailSerializer(JourneySerializer):
     route = RouteDetailSerializer()
     crews = CrewSerializer(many=True, read_only=True)
 
+
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketModel
