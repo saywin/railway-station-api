@@ -31,6 +31,7 @@ class TrainListSerializer(TrainSerializer):
 class TrainDetailSerializer(TrainSerializer):
     train_type = TrainTypeSerializer()
 
+
 class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrewModel
@@ -47,3 +48,19 @@ class StationSerializer(serializers.ModelSerializer):
     class Meta:
         model = StationModel
         fields = ["id", "name", "latitude", "longitude"]
+
+
+class RouteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RouteModel
+        fields = ["id", "source", "destination", "distance"]
+
+
+class RouteListSerializer(RouteSerializer):
+    source = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    destination = serializers.SlugRelatedField(slug_field="name", read_only=True)
+
+
+class RouteDetailSerializer(RouteSerializer):
+    source = StationSerializer(read_only=True)
+    destination = StationSerializer(read_only=True)
