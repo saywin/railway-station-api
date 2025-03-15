@@ -75,4 +75,30 @@ class RouteViewSet(viewsets.ModelViewSet):
         return RouteSerializer
 
 
-# Create your views here.
+class JourneyViewSet(viewsets.ModelViewSet):
+    queryset = JourneyModel.objects.all().select_related().prefetch_related("crews")
+    serializer_class = JourneySerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return JourneyListSerializer
+        if self.action == "retrieve":
+            return JourneyDetailSerializer
+        return self.serializer_class
+
+
+class TicketViewSet(viewsets.ModelViewSet):
+    queryset = TicketModel.objects.all()
+    serializer_class = TicketSerializer
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = OrderModel.objects.all()
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        return queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
