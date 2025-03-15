@@ -106,6 +106,23 @@ class JourneyDetailSerializer(JourneySerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        max_cargo = attrs["journey"].train.cargo_num
+        max_seat = attrs["journey"].train.places_in_cargo
+        TicketModel.validate_max_value_num(
+            num=attrs["cargo"],
+            max_num=max_cargo,
+            error=serializers.ValidationError,
+            name="Cargo",
+        )
+        TicketModel.validate_max_value_num(
+            num=attrs["seat"],
+            max_num=max_seat,
+            error=serializers.ValidationError,
+            name="Seat",
+        )
+        return super().validate(attrs)
+
     class Meta:
         model = TicketModel
         fields = ["id", "cargo", "seat", "journey", "order"]
@@ -118,6 +135,7 @@ class OrderSerializer(serializers.ModelSerializer):
         tickets = validated_data.pop("tickets")
         order = OrderModel.objects.create(**validated_data)
         for ticket in tickets:
+            ticket.pop("order", None)
             TicketModel.objects.create(order=order, **ticket)
         return order
 

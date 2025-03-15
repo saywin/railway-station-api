@@ -122,6 +122,11 @@ class TicketModel(models.Model):
         OrderModel, on_delete=models.CASCADE, related_name="tickets"
     )
 
+    @staticmethod
+    def validate_max_value_num(num: int, max_num: int, error, name: str):
+        if not (1 <= num <= max_num):
+            raise error({name: f"{name} must be in range [1, {max_num}], not {num}"})
+
     class Meta:
         db_table = "ticket"
         constraints = [
@@ -137,14 +142,12 @@ class TicketModel(models.Model):
     def clean(self, *args, **kwargs):
         cargo_num = self.journey.train.cargo_num
         places_in_cargo = self.journey.train.places_in_cargo
-        if not (1 <= self.cargo <= cargo_num):
-            raise ValidationError(
-                f"Cargo must be between [1, {cargo_num}]. Not {self.cargo}"
-            )
-        if not (1 <= self.seat <= places_in_cargo):
-            raise ValidationError(
-                f"Seat must be between [1, {places_in_cargo}]. Not {self.seat}"
-            )
+        self.validate_max_value_num(
+            num=self.cargo, max_num=cargo_num, error=ValidationError, name="Cargo"
+        )
+        self.validate_max_value_num(
+            num=self.seat, max_num=places_in_cargo, name="Seat", error=ValidationError
+        )
         super().clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
