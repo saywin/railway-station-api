@@ -64,3 +64,43 @@ class RouteListSerializer(RouteSerializer):
 class RouteDetailSerializer(RouteSerializer):
     source = StationSerializer(read_only=True)
     destination = StationSerializer(read_only=True)
+
+class JourneySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JourneyModel
+        fields = ["id", "route", "train", "departure_time", "arrival_time", "crews"]
+
+
+class JourneyListSerializer(serializers.ModelSerializer):
+    route_from = serializers.SlugRelatedField(
+        slug_field="source.name", source="route", read_only=True
+    )
+    route_to = serializers.SlugRelatedField(
+        slug_field="destination.name", source="route", read_only=True
+    )
+    train_name = serializers.SlugRelatedField(
+        slug_field="name", source="train", read_only=True
+    )
+    crews = serializers.SlugRelatedField(
+        slug_field="full_name", many=True, read_only=True
+    )
+
+    class Meta:
+        model = JourneyModel
+        fields = [
+            "id",
+            "train_name",
+            "route_from",
+            "route_to",
+            "departure_time",
+            "arrival_time",
+            "crews",
+        ]
+
+
+class JourneyDetailSerializer(JourneySerializer):
+    train = TrainDetailSerializer()
+    route = RouteDetailSerializer()
+    crews = CrewSerializer(many=True, read_only=True)
+
+
