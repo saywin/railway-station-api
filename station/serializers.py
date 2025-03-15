@@ -65,6 +65,7 @@ class RouteDetailSerializer(RouteSerializer):
     source = StationSerializer(read_only=True)
     destination = StationSerializer(read_only=True)
 
+
 class JourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = JourneyModel
@@ -103,4 +104,22 @@ class JourneyDetailSerializer(JourneySerializer):
     route = RouteDetailSerializer()
     crews = CrewSerializer(many=True, read_only=True)
 
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicketModel
+        fields = ["id", "cargo", "seat", "journey", "order"]
 
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+
+    def create(self, validated_data):
+        tickets = validated_data.pop("tickets")
+        order = OrderModel.objects.create(**validated_data)
+        for ticket in tickets:
+            TicketModel.objects.create(order=order, **ticket)
+        return order
+
+    class Meta:
+        model = OrderModel
+        fields = ["id", "created_at", "tickets"]
