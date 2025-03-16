@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins
 from rest_framework.pagination import PageNumberPagination
 
@@ -31,6 +32,7 @@ from station.serializers import (
 )
 
 
+@extend_schema(tags=["Train Type API"])
 class TrainTypeViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -42,6 +44,7 @@ class TrainTypeViewSet(
     serializer_class = TrainTypeSerializer
 
 
+@extend_schema(tags=["Train API"])
 class TrainViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -61,6 +64,7 @@ class TrainViewSet(
         return self.serializer_class
 
 
+@extend_schema(tags=["Crew API"])
 class CrewViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -72,6 +76,7 @@ class CrewViewSet(
     serializer_class = CrewSerializer
 
 
+@extend_schema(tags=["Station API"])
 class StationViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -83,6 +88,7 @@ class StationViewSet(
     serializer_class = StationSerializer
 
 
+@extend_schema(tags=["Route API"])
 class RouteViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -107,6 +113,7 @@ class RouteViewSet(
         return RouteSerializer
 
 
+@extend_schema(tags=["Journey API"])
 class JourneyViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -125,6 +132,7 @@ class JourneyViewSet(
         return self.serializer_class
 
 
+@extend_schema(tags=["Ticket API"])
 class TicketViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -148,6 +156,7 @@ class OrderSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 
+@extend_schema(tags=["Order API"])
 class OrderViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
