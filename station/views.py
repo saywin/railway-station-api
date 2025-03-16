@@ -1,7 +1,9 @@
-from django.shortcuts import render
-from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, mixins
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from station.models import (
     TrainTypeModel,
@@ -29,7 +31,17 @@ from station.serializers import (
     OrderSerializer,
     TicketSerializer,
     TicketListSerializer,
+    TrainImageSerializer,
+    StationImageSerializer,
 )
+
+
+def image_upload(obj, serializer, data):
+    train = obj
+    serializer = serializer(train, data=data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return serializer
 
 
 @extend_schema(tags=["Train Type API"])
@@ -52,8 +64,14 @@ class TrainViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
 ):
-    queryset = TrainModel.objects.select_related()
-    serializer_class = TrainListSerializer
+    queryset = TrainModel.objects.all()
+    serializer_class = TrainSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action in ["retrieve", "list"]:
+            queryset = queryset.select_related()
+        return queryset
 
     def get_serializer_class(self):
         print(self.action)
@@ -61,7 +79,21 @@ class TrainViewSet(
             return TrainListSerializer
         if self.action == "retrieve":
             return TrainDetailSerializer
+        if self.action == "upload_image":
+            return TrainImageSerializer
         return self.serializer_class
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="train-image",
+    )
+    def upload_image(self, request, pk=None):
+        train = self.get_object()
+        serializer = self.get_serializer(train, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=["Crew API"])
@@ -86,6 +118,23 @@ class StationViewSet(
 ):
     queryset = StationModel.objects.all()
     serializer_class = StationSerializer
+
+    def get_serializer_class(self):
+        if self.action == "upload_image":
+            return StationImageSerializer
+        return StationSerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="station-image",
+    )
+    def upload_image(self, request, pk=None):
+        station = self.get_object()
+        serializer = self.get_serializer(station, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=["Route API"])
@@ -120,6 +169,26 @@ class RouteViewSet(
         if self.action == "retrieve":
             return RouteDetailSerializer
         return RouteSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="source",
+                description="Filter by source",
+                required=False,
+                type=str,
+            ),
+            OpenApiParameter(
+                name="destination",
+                description="Filter by destination",
+                required=False,
+                type=str,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List Route with filter by source and destination"""
+        return super().list(request, *args, **kwargs)
 
 
 @extend_schema(tags=["Journey API"])
@@ -158,6 +227,32 @@ class JourneyViewSet(
             return JourneyDetailSerializer
         return self.serializer_class
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="from",
+                description="Filter by route_from (ex. ?from='Dnipro')",
+                required=False,
+                type=str,
+            ),
+            OpenApiParameter(
+                name="to",
+                description="Filter by route_to (ex. ?to='Kyiv')",
+                required=False,
+                type=str,
+            ),
+            OpenApiParameter(
+                name="date",
+                description="Filter by date (ex. ?date='2023-06-12')",
+                required=False,
+                type=OpenApiTypes.DATE,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List Journey with filter by route_from, route_to and date"""
+        return super().list(request, *args, **kwargs)
+
 
 @extend_schema(tags=["Ticket API"])
 class TicketViewSet(
@@ -168,13 +263,18 @@ class TicketViewSet(
     mixins.UpdateModelMixin,
 ):
     queryset = TicketModel.objects.all()
-    serializer_class = TicketListSerializer
+    serializer_class = TicketSerializer
 
     def get_queryset(self):
         queryset = self.queryset
         if self.action in ["list", "retrieve"]:
             queryset = queryset.select_related()
         return queryset
+
+    def get_serializer_class(self):
+        if self.action in ["retrieve", "list"]:
+            return TicketListSerializer
+        return TicketSerializer
 
 
 class OrderSetPagination(PageNumberPagination):

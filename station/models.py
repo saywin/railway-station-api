@@ -1,7 +1,22 @@
+import os
+import pathlib
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
+
+
+def station_image_path(instance: "StationModel", file_name: str) -> str:
+    file = f"{slugify(instance.name)}-{uuid.uuid4()}" + pathlib.Path(file_name).suffix
+    return os.path.join("upload", "station", file)
+
+
+def train_image_path(instance: "TrainModel", file_name: os.path) -> str:
+    file = f"{slugify(instance.name)}-{uuid.uuid4()}" + pathlib.Path(file_name).suffix
+    return os.path.join("upload", "train", file)
 
 
 class TrainTypeModel(models.Model):
@@ -22,6 +37,7 @@ class TrainModel(models.Model):
     train_type = models.ForeignKey(
         TrainTypeModel, on_delete=models.CASCADE, verbose_name="trains"
     )
+    image = models.ImageField(upload_to=train_image_path, null=True)
 
     class Meta:
         db_table = "train"
@@ -51,6 +67,7 @@ class StationModel(models.Model):
     name = models.CharField(max_length=255)
     latitude = models.FloatField()
     longitude = models.FloatField()
+    image = models.ImageField(upload_to=station_image_path, null=True)
 
     class Meta:
         db_table = "station"
