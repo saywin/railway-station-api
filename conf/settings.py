@@ -148,6 +148,9 @@ INTERNAL_IPS = [
 
 # DRF SETTINGS
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     "DEFAULT_PERMISSION_CLASSES": [
         "conf.permissions.IsAuthenticatedReadOnlyIsAdminAll",
     ],
