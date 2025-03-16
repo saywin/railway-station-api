@@ -133,6 +133,24 @@ class JourneyViewSet(
     queryset = JourneyModel.objects.all()
     serializer_class = JourneySerializer
 
+    def get_queryset(self):
+        queryset = self.queryset
+        departure_time = self.request.query_params.get("date")
+        if departure_time:
+            queryset = queryset.filter(departure_time__date=departure_time)
+
+        route_from = self.request.query_params.get("from")
+        if route_from:
+            queryset = queryset.filter(route__source__name__icontains=route_from)
+
+        route_to = self.request.query_params.get("to")
+        if route_to:
+            queryset = queryset.filter(route__destination__name__icontains=route_to)
+
+        if self.action in ["list", "retrieve"]:
+            queryset = queryset.select_related().prefetch_related("crews")
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return JourneyListSerializer
