@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 
 from station.models import (
     TrainTypeModel,
@@ -26,15 +26,28 @@ from station.serializers import (
     JourneyDetailSerializer,
     OrderSerializer,
     TicketSerializer,
+    TicketListSerializer,
 )
 
 
-class TrainTypeViewSet(viewsets.ModelViewSet):
+class TrainTypeViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = TrainTypeModel.objects.all()
     serializer_class = TrainTypeSerializer
 
 
-class TrainViewSet(viewsets.ModelViewSet):
+class TrainViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = TrainModel.objects.select_related()
     serializer_class = TrainListSerializer
 
@@ -47,17 +60,35 @@ class TrainViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
 
-class CrewViewSet(viewsets.ModelViewSet):
+class CrewViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = CrewModel.objects.all()
     serializer_class = CrewSerializer
 
 
-class StationViewSet(viewsets.ModelViewSet):
+class StationViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = StationModel.objects.all()
     serializer_class = StationSerializer
 
 
-class RouteViewSet(viewsets.ModelViewSet):
+class RouteViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = RouteModel.objects.all()
     serializer_class = RouteSerializer
 
@@ -75,7 +106,13 @@ class RouteViewSet(viewsets.ModelViewSet):
         return RouteSerializer
 
 
-class JourneyViewSet(viewsets.ModelViewSet):
+class JourneyViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = JourneyModel.objects.all().select_related().prefetch_related("crews")
     serializer_class = JourneySerializer
 
@@ -87,19 +124,38 @@ class JourneyViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
 
-class TicketViewSet(viewsets.ModelViewSet):
+class TicketViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = TicketModel.objects.all()
-    serializer_class = TicketSerializer
+    serializer_class = TicketListSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action in ["list", "retrieve"]:
+            queryset = queryset.select_related()
+        return queryset
 
 
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = OrderModel.objects.all()
     serializer_class = OrderSerializer
 
-    #
     def get_queryset(self):
-        queryset = self.queryset
-        return queryset.filter(user=self.request.user)
+        queryset = self.queryset.filter(user=self.request.user)
+        if self.action in ["list", "retrieve"]:
+            queryset = queryset.prefetch_related("tickets__journey__crews")
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

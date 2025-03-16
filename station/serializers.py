@@ -106,6 +106,7 @@ class JourneyDetailSerializer(JourneySerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+
     def validate(self, attrs):
         max_cargo = attrs["journey"].train.cargo_num
         max_seat = attrs["journey"].train.places_in_cargo
@@ -128,8 +129,12 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ["id", "cargo", "seat", "journey", "order"]
 
 
+class TicketListSerializer(TicketSerializer):
+    journey = JourneyListSerializer()
+
+
 class OrderSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+    tickets = TicketListSerializer(many=True, read_only=False, allow_empty=False)
 
     def create(self, validated_data):
         tickets = validated_data.pop("tickets")
