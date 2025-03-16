@@ -101,6 +101,15 @@ class RouteViewSet(
 
     def get_queryset(self):
         queryset = self.queryset
+
+        source = self.request.query_params.get("source")
+        if source:
+            queryset = queryset.filter(source__name__icontains=source)
+
+        destination = self.request.query_params.get("destination")
+        if destination:
+            queryset = queryset.filter(destination__name__icontains=destination)
+
         if self.action in ["list", "retrieve"]:
             queryset = queryset.select_related("source", "destination")
         return queryset
@@ -121,7 +130,7 @@ class JourneyViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
 ):
-    queryset = JourneyModel.objects.all().select_related().prefetch_related("crews")
+    queryset = JourneyModel.objects.all()
     serializer_class = JourneySerializer
 
     def get_serializer_class(self):
