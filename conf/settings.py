@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "station",
     "user",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -145,7 +146,7 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-
+# DRF SETTINGS
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
@@ -154,4 +155,19 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {"anon": "50/hour", "user": "150/hour"},
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+
+# SWAGGER SETTINGS
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Railway Station API",
+    "DESCRIPTION": "API for managing railway station data: station details, schedules, train status, and route search.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+    },
 }
