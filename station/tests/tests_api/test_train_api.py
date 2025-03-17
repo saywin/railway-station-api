@@ -51,7 +51,7 @@ class AuthorizedTrainTest(APITestCase):
 
     def test_train_detail(self):
         train = create_train()
-        url = reverse("station:train-detail", args=[train.id])
+        url = detail_train_url(train.id)
         res = self.client.get(url)
         serializer = TrainDetailSerializer(train)
 
