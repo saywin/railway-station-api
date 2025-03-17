@@ -75,7 +75,6 @@ class TrainViewSet(
         return queryset
 
     def get_serializer_class(self):
-        print(self.action)
         if self.action == "list":
             return TrainListSerializer
         if self.action == "retrieve":

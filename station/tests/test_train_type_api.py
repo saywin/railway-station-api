@@ -13,13 +13,13 @@ def create_train_type():
     return TrainTypeModel.objects.create(name="Heavy Rail")
 
 
-class UnAuthorizationTrainTypeTest(APITestCase):
+class UnAuthorizedTrainTypeTest(APITestCase):
     def test_train_type_get_no_access(self):
         res = self.client.get(URL_TRAIN_TYPE_LIST)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class AuthorizationTrainTypeTest(APITestCase):
+class AuthorizedTrainTypeTest(APITestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(
             email="user@user.com", password="password"
