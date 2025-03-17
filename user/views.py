@@ -6,9 +6,10 @@ from rest_framework.settings import api_settings
 from rest_framework_simplejwt.views import (
     TokenRefreshView as DjangoTokenRefreshView,
     TokenVerifyView as DjangoTokenVerifyView,
+    TokenObtainPairView,
 )
 
-from user.serializers import UserSerializer, AuthTokenSerializer
+from user.serializers import UserSerializer
 
 
 @extend_schema(tags=["User API"])
@@ -27,9 +28,8 @@ class UserCreateView(generics.CreateAPIView):
 
 
 @extend_schema(tags=["Authenticated"])
-class LoginUserView(ObtainAuthToken):
+class LoginUserView(TokenObtainPairView):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
-    serializer_class = AuthTokenSerializer
 
 
 @extend_schema(tags=["Authenticated API"])
