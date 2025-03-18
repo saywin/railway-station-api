@@ -1,9 +1,14 @@
+from datetime import datetime
+
+from pytz import timezone
+
 from station.models import (
     StationModel,
     RouteModel,
     TrainTypeModel,
     TrainModel,
     JourneyModel,
+    CrewModel,
 )
 
 
@@ -39,3 +44,25 @@ def create_train(**kwargs):
     }
     data.update(**kwargs)
     return TrainModel.objects.create(**data)
+
+
+def create_crew(**kwargs) -> CrewModel:
+    data = {
+        "first_name": "Taras",
+        "last_name": "Smith",
+    }
+    data.update(**kwargs)
+    return CrewModel.objects.create(**data)
+
+
+def create_journey(**kwargs):
+    departure_time = datetime(2022, 6, 14, 15, 34, tzinfo=timezone("Europe/Kiev"))
+    arrival_time = datetime(2022, 6, 14, 21, 40, tzinfo=timezone("Europe/Kiev"))
+    data = {
+        "route": create_route(),
+        "train": create_train(),
+        "departure_time": departure_time,
+        "arrival_time": arrival_time,
+    }
+    data.update(**kwargs)
+    return JourneyModel.objects.create(**data)
