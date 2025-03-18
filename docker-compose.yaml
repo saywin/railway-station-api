@@ -1,4 +1,19 @@
 services:
+  web:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    command: >
+      sh -c "python manage.py makemigrations && 
+      python manage.py migrate && 
+      python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - pg_db
+
   pg_db:
     image: postgres:16.8-alpine3.21
     restart: always
@@ -11,3 +26,4 @@ services:
 
 volumes:
   my_db:
+  my_media:
