@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
@@ -31,9 +32,11 @@ from station.serializers import (
     JourneyDetailSerializer,
     OrderSerializer,
     TicketSerializer,
-    TicketListSerializer,
+    # TicketListSerializer,
     TrainImageSerializer,
     StationImageSerializer,
+    TicketListSerializer,
+    OrderListSerializer,
 )
 
 
@@ -294,12 +297,20 @@ class OrderViewSet(
     queryset = OrderModel.objects.all()
     serializer_class = OrderSerializer
     pagination_class = OrderSetPagination
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_queryset(self):
         queryset = self.queryset.filter(user=self.request.user)
         if self.action in ["list", "retrieve"]:
             queryset = queryset.prefetch_related("tickets__journey__crews")
         return queryset
+
+    def get_serializer_class(self):
+        if self.action in ["list", "retrieve"]:
+            return OrderListSerializer
+        return self.serializer_class
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

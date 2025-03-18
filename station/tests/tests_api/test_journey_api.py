@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from station.models import JourneyModel, CrewModel
+from station.models import JourneyModel
 from station.serializers import (
     JourneyListSerializer,
     JourneyDetailSerializer,
@@ -16,6 +16,8 @@ from station.tests.tests_api.test_helpers import (
     create_route,
     create_train,
     create_station,
+    create_crew,
+    create_journey,
 )
 
 URL_JOURNEY_LIST = reverse("station:journey-list")
@@ -27,36 +29,14 @@ def detail_route_url(pk: int) -> str:
     return reverse("station:journey-detail", args=[pk])
 
 
-def create_crew(**kwargs) -> CrewModel:
-    data = {
-        "first_name": "Taras",
-        "last_name": "Smith",
-    }
-    data.update(**kwargs)
-    return CrewModel.objects.create(**data)
-
-
-def create_journey(**kwargs):
-    departure_time = datetime(2022, 6, 14, 15, 34, tzinfo=timezone("Europe/Kiev"))
-    arrival_time = datetime(2022, 6, 14, 21, 40, tzinfo=timezone("Europe/Kiev"))
-    data = {
-        "route": ROUTE,
-        "train": TRAIN,
-        "departure_time": departure_time,
-        "arrival_time": arrival_time,
-    }
-    data.update(**kwargs)
-    return JourneyModel.objects.create(**data)
-
-
-class UnAuthorizedCrewTest(APITestCase):
+class UnAuthorizedJourneyTest(APITestCase):
     def test_crew_list_unauthorized(self):
         res = self.client.get(URL_JOURNEY_LIST)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class AuthorizedCrewTest(APITestCase):
+class AuthorizedJourneyTest(APITestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(
             email="user@user.com", password="password"
@@ -80,7 +60,7 @@ class AuthorizedCrewTest(APITestCase):
         routes = JourneyModel.objects.all()
         serializer = JourneyListSerializer(routes, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(routes.count(), 2)
+        self.assertEqual(routes.count(), 3)
         self.assertIn(serializer.data[0], res.data["results"])
         self.assertIn(serializer.data[1], res.data["results"])
 

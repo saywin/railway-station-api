@@ -5,17 +5,9 @@ from rest_framework.test import APITestCase
 
 from station.models import CrewModel
 from station.serializers import CrewSerializer
+from station.tests.tests_api.test_helpers import create_crew
 
 URL_CREW_LIST = reverse("station:crew-list")
-
-
-def create_crew(**kwargs) -> CrewModel:
-    data = {
-        "first_name": "Taras",
-        "last_name": "Smith",
-    }
-    data.update(**kwargs)
-    return CrewModel.objects.create(**data)
 
 
 def detail_crew_url(pk: int) -> str:
