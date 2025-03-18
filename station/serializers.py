@@ -100,6 +100,7 @@ class JourneySerializer(serializers.ModelSerializer):
 
 
 class JourneyListSerializer(serializers.ModelSerializer):
+    tickets_available = serializers.IntegerField(read_only=True)
     route_from = serializers.SlugRelatedField(
         slug_field="source.name", source="route", read_only=True
     )
@@ -122,6 +123,7 @@ class JourneyListSerializer(serializers.ModelSerializer):
             "route_to",
             "departure_time",
             "arrival_time",
+            "tickets_available",
             "crews",
         ]
 

@@ -1,3 +1,4 @@
+from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
@@ -207,6 +208,12 @@ class JourneyViewSet(
 
     def get_queryset(self):
         queryset = self.queryset
+        if self.action == "list":
+            queryset = queryset.annotate(
+                tickets_available=F("train__cargo_num") * F("train__places_in_cargo")
+                - Count("tickets")
+            )
+
         departure_time = self.request.query_params.get("date")
         if departure_time:
             queryset = queryset.filter(departure_time__date=departure_time)
@@ -255,29 +262,6 @@ class JourneyViewSet(
     def list(self, request, *args, **kwargs):
         """List Journey with filter by route_from, route_to and date"""
         return super().list(request, *args, **kwargs)
-
-
-@extend_schema(tags=["Ticket API"])
-class TicketViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-):
-    queryset = TicketModel.objects.all()
-    serializer_class = TicketSerializer
-
-    def get_queryset(self):
-        queryset = self.queryset
-        if self.action in ["list", "retrieve"]:
-            queryset = queryset.select_related()
-        return queryset
-
-    def get_serializer_class(self):
-        if self.action in ["retrieve", "list"]:
-            return TicketListSerializer
-        return TicketSerializer
 
 
 class OrderSetPagination(PageNumberPagination):

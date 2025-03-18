@@ -43,7 +43,6 @@ class AuthorizedJourneyTest(APITestCase):
         res = self.client.post(URL_ORDER_LIST, {"tickets": tickets}, format="json")
         order = OrderModel.objects.get(id=res.data["id"])
         serializer = OrderSerializer(order)
-        print(serializer.data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(serializer.data, res.data)
 
