@@ -3,36 +3,15 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from station.models import RouteModel, StationModel
+from station.models import RouteModel
 from station.serializers import (
     RouteSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
 )
+from station.tests.tests_api.test_helpers import create_station, create_route
 
 URL_ROUTE_LIST = reverse("station:route-list")
-
-
-def create_station(**kwargs) -> StationModel:
-    data = {
-        "name": "Dnipro Main",
-        "latitude": 30.6546456,
-        "longitude": 32.746357,
-    }
-    data.update(**kwargs)
-    return StationModel.objects.create(**data)
-
-
-def create_route(**kwargs) -> RouteModel:
-    source = create_station()
-    destination = create_station(name="Kyiv Passage")
-    data = {
-        "source": source,
-        "destination": destination,
-        "distance": 532,
-    }
-    data.update(**kwargs)
-    return RouteModel.objects.create(**data)
 
 
 def detail_route_url(pk: int) -> str:
@@ -92,15 +71,21 @@ class AuthorizedCrewTest(APITestCase):
         route_1 = create_route(source=source, destination=destination)
         route_2 = create_route(source=source)
         route_3 = create_route(destination=destination)
-
-        res = self.client.get(URL_ROUTE_LIST, {"source": "Lisichansk"})
         serializer_route_1 = RouteListSerializer(route_1)
         serializer_route_2 = RouteListSerializer(route_2)
         serializer_route_3 = RouteListSerializer(route_3)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(serializer_route_1.data, res.data["results"])
-        self.assertIn(serializer_route_2.data, res.data["results"])
-        self.assertNotIn(serializer_route_3.data, res.data["results"])
+
+        res_source = self.client.get(URL_ROUTE_LIST, {"source": "Lisichansk"})
+        self.assertEqual(res_source.status_code, status.HTTP_200_OK)
+        self.assertIn(serializer_route_1.data, res_source.data["results"])
+        self.assertIn(serializer_route_2.data, res_source.data["results"])
+        self.assertNotIn(serializer_route_3.data, res_source.data["results"])
+
+        res_destination = self.client.get(URL_ROUTE_LIST, {"destination": "Lviv"})
+        self.assertEqual(res_destination.status_code, status.HTTP_200_OK)
+        self.assertIn(serializer_route_1.data, res_destination.data["results"])
+        self.assertIn(serializer_route_3.data, res_destination.data["results"])
+        self.assertNotIn(serializer_route_2.data, res_destination.data["results"])
 
 
 class AdminRouteTest(APITestCase):

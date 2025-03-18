@@ -22,7 +22,14 @@ class TrainTypeSerializer(serializers.ModelSerializer):
 class TrainSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainModel
-        fields = ["id", "name", "cargo_num", "places_in_cargo", "train_type", "image"]
+        fields = [
+            "id",
+            "name",
+            "cargo_num",
+            "places_in_cargo",
+            "train_type",
+            "image",
+        ]
 
 
 class TrainListSerializer(TrainSerializer):
@@ -82,7 +89,14 @@ class RouteDetailSerializer(RouteSerializer):
 class JourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = JourneyModel
-        fields = ["id", "route", "train", "departure_time", "arrival_time", "crews"]
+        fields = [
+            "id",
+            "route",
+            "train",
+            "departure_time",
+            "arrival_time",
+            "crews",
+        ]
 
 
 class JourneyListSerializer(serializers.ModelSerializer):
@@ -113,6 +127,8 @@ class JourneyListSerializer(serializers.ModelSerializer):
 
 
 class JourneyDetailSerializer(JourneySerializer):
+    departure_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
+    arrival_time = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     train = TrainDetailSerializer()
     route = RouteDetailSerializer()
     crews = CrewSerializer(many=True, read_only=True)
