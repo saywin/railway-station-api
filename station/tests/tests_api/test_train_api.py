@@ -1,29 +1,17 @@
 from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from station.models import TrainTypeModel, TrainModel
 from station.serializers import TrainListSerializer, TrainDetailSerializer
+from station.tests.tests_api.test_helpers import create_train
 
 URL_TRAIN_LIST = reverse("station:train-list")
 
 
 def detail_train_url(pk: int) -> str:
     return reverse("station:train-detail", args=[pk])
-
-
-def create_train(**kwargs):
-    train_type = TrainTypeModel.objects.create(name="Light Rail")
-    data = {
-        "name": "Kyiv Pass",
-        "cargo_num": 20,
-        "places_in_cargo": 30,
-        "train_type": train_type,
-    }
-    data.update(**kwargs)
-    return TrainModel.objects.create(**data)
 
 
 class UnAuthorizedTrainTest(APITestCase):

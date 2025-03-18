@@ -5,18 +5,9 @@ from rest_framework.test import APITestCase
 
 from station.models import StationModel
 from station.serializers import StationSerializer
+from station.tests.tests_api.test_helpers import create_station
 
 URL_STATION_LIST = reverse("station:station-list")
-
-
-def create_station(**kwargs) -> StationModel:
-    data = {
-        "name": "Dnipro Main",
-        "latitude": 30.6546456,
-        "longitude": 32.746357,
-    }
-    data.update(**kwargs)
-    return StationModel.objects.create(**data)
 
 
 def detail_station_url(pk: int) -> str:

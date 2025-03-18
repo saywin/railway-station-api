@@ -11,8 +11,8 @@ URL_CREW_LIST = reverse("station:crew-list")
 
 def create_crew(**kwargs) -> CrewModel:
     data = {
-        "first_name": "Kyiv Pass",
-        "last_name": 20,
+        "first_name": "Taras",
+        "last_name": "Smith",
     }
     data.update(**kwargs)
     return CrewModel.objects.create(**data)
