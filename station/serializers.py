@@ -155,7 +155,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketModel
-        fields = ["id", "cargo", "seat", "journey", "order"]
+        fields = ["id", "cargo", "seat", "journey"]
 
 
 class TicketListSerializer(TicketSerializer):
@@ -163,7 +163,7 @@ class TicketListSerializer(TicketSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    tickets = TicketListSerializer(many=True, read_only=False, allow_empty=False)
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -177,3 +177,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderModel
         fields = ["id", "created_at", "tickets"]
+
+
+class OrderListSerializer(OrderSerializer):
+    tickets = TicketListSerializer(many=True, read_only=False)
