@@ -16,7 +16,6 @@ from station.models import (
     RouteModel,
     JourneyModel,
     OrderModel,
-    TicketModel,
 )
 from station.serializers import (
     TrainTypeSerializer,
@@ -32,11 +31,8 @@ from station.serializers import (
     JourneyListSerializer,
     JourneyDetailSerializer,
     OrderSerializer,
-    TicketSerializer,
-    # TicketListSerializer,
     TrainImageSerializer,
     StationImageSerializer,
-    TicketListSerializer,
     OrderListSerializer,
 )
 
@@ -161,7 +157,9 @@ class RouteViewSet(
 
         destination = self.request.query_params.get("destination")
         if destination:
-            queryset = queryset.filter(destination__name__icontains=destination)
+            queryset = queryset.filter(
+                destination__name__icontains=destination
+            )
 
         if self.action in ["list", "retrieve"]:
             queryset = queryset.select_related("source", "destination")
@@ -210,7 +208,9 @@ class JourneyViewSet(
         queryset = self.queryset
         if self.action == "list":
             queryset = queryset.annotate(
-                tickets_available=F("train__cargo_num") * F("train__places_in_cargo")
+                tickets_available=(
+                    F("train__cargo_num") * F("train__places_in_cargo")
+                    )
                 - Count("tickets")
             )
 
@@ -220,11 +220,15 @@ class JourneyViewSet(
 
         route_from = self.request.query_params.get("from")
         if route_from:
-            queryset = queryset.filter(route__source__name__icontains=route_from)
+            queryset = queryset.filter(
+                route__source__name__icontains=route_from
+            )
 
         route_to = self.request.query_params.get("to")
         if route_to:
-            queryset = queryset.filter(route__destination__name__icontains=route_to)
+            queryset = queryset.filter(
+                route__destination__name__icontains=route_to
+            )
 
         if self.action in ["list", "retrieve"]:
             queryset = queryset.select_related().prefetch_related("crews")

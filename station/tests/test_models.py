@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
@@ -125,7 +124,8 @@ class CrewModelTest(TestCase):
 
     def test_crew_full_name(self):
         self.assertEqual(
-            self.crew.full_name, f"{self.crew.first_name} {self.crew.last_name}"
+            self.crew.full_name,
+            f"{self.crew.first_name} {self.crew.last_name}"
         )
 
     def test_crew_str(self):
@@ -177,7 +177,8 @@ class RouteModelTest(TestCase):
     def test_route_str(self):
         self.assertEqual(
             str(self.route),
-            f"Source: {self.route.source.name}, destination: {self.route.destination.name}",
+            f"Source: {self.route.source.name}, "
+            f"destination: {self.route.destination.name}",
         )
 
     def test_route_db_table_name(self):
@@ -216,7 +217,8 @@ class OrderModelTest(TestCase):
 
     def test_order_str(self):
         self.assertEqual(
-            str(self.order), f"{self.order.user.email}, " f"{self.order.created_at}"
+            str(self.order),
+            f"{self.order.user.email}, " f"{self.order.created_at}"
         )
 
     def test_order_db_table_name(self):

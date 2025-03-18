@@ -54,10 +54,16 @@ class AuthorizedJourneyTest(APITestCase):
         self.station = create_station(name="Lviv station")
         route_2 = create_route(destination=self.station)
         route_3 = create_route(source=self.station)
-        departure_time = datetime(2022, 4, 14, 12, 34, tzinfo=timezone("Europe/Kiev"))
+        departure_time = datetime(
+            2022, 4, 14, 12, 34,
+            tzinfo=timezone("Europe/Kiev")
+        )
         self.journey = create_journey()
         self.journey_2 = create_journey(route=route_2)
-        self.journey_3 = create_journey(route=route_3, departure_time=departure_time)
+        self.journey_3 = create_journey(
+            route=route_3,
+            departure_time=departure_time
+        )
         journeys = route_with_annotate().filter(
             id__in=[self.journey.id, self.journey_2.id, self.journey_3.id]
         )
@@ -103,15 +109,24 @@ class AuthorizedJourneyTest(APITestCase):
         self.assertNotIn(self.serializer_2, res_filter_to.data["results"])
 
     def test_journey_filter_by_date(self):
-        res_filter_date = self.client.get(URL_JOURNEY_LIST, {"date": "2022-04-14"})
+        res_filter_date = self.client.get(
+            URL_JOURNEY_LIST,
+            {"date": "2022-04-14"}
+        )
         self.assertEqual(res_filter_date.status_code, status.HTTP_200_OK)
         self.assertNotIn(self.serializer_1, res_filter_date.data["results"])
         self.assertNotIn(self.serializer_2, res_filter_date.data["results"])
         self.assertIn(self.serializer_3, res_filter_date.data["results"])
 
     def test_journey_create_forbidden(self):
-        departure_time = datetime(2023, 6, 14, 15, 34, tzinfo=timezone("Europe/Kiev"))
-        arrival_time = datetime(2023, 6, 14, 21, 40, tzinfo=timezone("Europe/Kiev"))
+        departure_time = datetime(
+            2023, 6, 14, 15, 34,
+            tzinfo=timezone("Europe/Kiev")
+        )
+        arrival_time = datetime(
+            2023, 6, 14, 21, 40,
+            tzinfo=timezone("Europe/Kiev")
+        )
         payload = {
             "route": ROUTE,
             "train": TRAIN,
@@ -137,8 +152,14 @@ class AdminJourneyTest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_journey_create(self):
-        departure_time = datetime(2020, 6, 14, 15, 34, tzinfo=timezone("Europe/Kiev"))
-        arrival_time = datetime(2020, 6, 15, 21, 40, tzinfo=timezone("Europe/Kiev"))
+        departure_time = datetime(
+            2020, 6, 14, 15, 34,
+            tzinfo=timezone("Europe/Kiev")
+        )
+        arrival_time = datetime(
+            2020, 6, 15, 21, 40,
+            tzinfo=timezone("Europe/Kiev")
+        )
         crew = create_crew()
         route = create_route()
         train = create_train()

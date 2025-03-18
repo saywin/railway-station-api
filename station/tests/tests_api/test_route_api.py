@@ -81,11 +81,17 @@ class AuthorizedCrewTest(APITestCase):
         self.assertIn(serializer_route_2.data, res_source.data["results"])
         self.assertNotIn(serializer_route_3.data, res_source.data["results"])
 
-        res_destination = self.client.get(URL_ROUTE_LIST, {"destination": "Lviv"})
+        res_destination = self.client.get(
+            URL_ROUTE_LIST,
+            {"destination": "Lviv"}
+        )
         self.assertEqual(res_destination.status_code, status.HTTP_200_OK)
         self.assertIn(serializer_route_1.data, res_destination.data["results"])
         self.assertIn(serializer_route_3.data, res_destination.data["results"])
-        self.assertNotIn(serializer_route_2.data, res_destination.data["results"])
+        self.assertNotIn(
+            serializer_route_2.data,
+            res_destination.data["results"]
+        )
 
 
 class AdminRouteTest(APITestCase):

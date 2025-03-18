@@ -40,7 +40,11 @@ class AuthorizedJourneyTest(APITestCase):
             {"cargo": 1, "seat": 10, "journey": journey.id},
             {"cargo": 1, "seat": 11, "journey": journey.id},
         ]
-        res = self.client.post(URL_ORDER_LIST, {"tickets": tickets}, format="json")
+        res = self.client.post(
+            URL_ORDER_LIST,
+            {"tickets": tickets},
+            format="json"
+        )
         order = OrderModel.objects.get(id=res.data["id"])
         serializer = OrderSerializer(order)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -64,11 +68,19 @@ class AuthorizedJourneyTest(APITestCase):
         ticket_1 = [
             {"cargo": 33, "seat": 15, "journey": journey.id},
         ]
-        res_1 = self.client.post(URL_ORDER_LIST, {"tickets": ticket_1}, format="json")
+        res_1 = self.client.post(
+            URL_ORDER_LIST,
+            {"tickets": ticket_1},
+            format="json"
+        )
         ticket_2 = [
             {"cargo": 10, "seat": 33, "journey": journey.id},
         ]
-        res_2 = self.client.post(URL_ORDER_LIST, {"tickets": ticket_2}, format="json")
+        res_2 = self.client.post(
+            URL_ORDER_LIST,
+            {"tickets": ticket_2},
+            format="json"
+        )
         self.assertEqual(res_1.status_code, 400)
         self.assertEqual(res_2.status_code, 400)
 

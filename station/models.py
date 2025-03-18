@@ -10,12 +10,18 @@ from rest_framework.exceptions import ValidationError
 
 
 def station_image_path(instance: "StationModel", file_name: str) -> str:
-    file = f"{slugify(instance.name)}-{uuid.uuid4()}" + pathlib.Path(file_name).suffix
+    file = (
+        f"{slugify(instance.name)}-{uuid.uuid4()}" +
+        pathlib.Path(file_name).suffix
+    )
     return os.path.join("upload", "station", file)
 
 
 def train_image_path(instance: "TrainModel", file_name: os.path) -> str:
-    file = f"{slugify(instance.name)}-{uuid.uuid4()}" + pathlib.Path(file_name).suffix
+    file = (
+        f"{slugify(instance.name)}-{uuid.uuid4()}" +
+        pathlib.Path(file_name).suffix
+    )
     return os.path.join("upload", "train", file)
 
 
@@ -87,7 +93,10 @@ class RouteModel(models.Model):
     distance = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"Source: {self.source.name}, destination: {self.destination.name}"
+        return (
+            f"Source: {self.source.name}, "
+            f"destination: {self.destination.name}"
+        )
 
     class Meta:
         db_table = "route"
@@ -136,13 +145,17 @@ class TicketModel(models.Model):
         JourneyModel, on_delete=models.CASCADE, related_name="tickets"
     )
     order = models.ForeignKey(
-        OrderModel, on_delete=models.CASCADE, related_name="tickets"
+        OrderModel,
+        on_delete=models.CASCADE,
+        related_name="tickets"
     )
 
     @staticmethod
     def validate_max_value_num(num: int, max_num: int, error, name: str):
         if not (1 <= num <= max_num):
-            raise error({name: f"{name} must be in range [1, {max_num}], not {num}"})
+            raise error(
+                {name: f"{name} must be in range [1, {max_num}], not {num}"}
+            )
 
     class Meta:
         db_table = "ticket"
@@ -160,10 +173,16 @@ class TicketModel(models.Model):
         cargo_num = self.journey.train.cargo_num
         places_in_cargo = self.journey.train.places_in_cargo
         self.validate_max_value_num(
-            num=self.cargo, max_num=cargo_num, error=ValidationError, name="Cargo"
+            num=self.cargo,
+            max_num=cargo_num,
+            error=ValidationError,
+            name="Cargo"
         )
         self.validate_max_value_num(
-            num=self.seat, max_num=places_in_cargo, name="Seat", error=ValidationError
+            num=self.seat,
+            max_num=places_in_cargo,
+            name="Seat",
+            error=ValidationError
         )
         super().clean(*args, **kwargs)
 

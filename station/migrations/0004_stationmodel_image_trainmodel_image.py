@@ -7,7 +7,10 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("station", "0003_remove_trainmodel_unique_cargo_num_places_in_cargo_and_more"),
+        (
+            "station",
+            "0003_remove_trainmodel_unique_cargo_num_places_in_cargo_and_more"
+        ),
     ]
 
     operations = [

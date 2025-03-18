@@ -56,8 +56,14 @@ def create_crew(**kwargs) -> CrewModel:
 
 
 def create_journey(**kwargs):
-    departure_time = datetime(2022, 6, 14, 15, 34, tzinfo=timezone("Europe/Kiev"))
-    arrival_time = datetime(2022, 6, 14, 21, 40, tzinfo=timezone("Europe/Kiev"))
+    departure_time = datetime(
+        2022, 6, 14, 15, 34,
+        tzinfo=timezone("Europe/Kiev")
+    )
+    arrival_time = datetime(
+        2022, 6, 14, 21, 40,
+        tzinfo=timezone("Europe/Kiev")
+    )
     data = {
         "route": create_route(),
         "train": create_train(),

@@ -33,7 +33,9 @@ class TrainSerializer(serializers.ModelSerializer):
 
 
 class TrainListSerializer(TrainSerializer):
-    train_type = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    train_type = serializers.SlugRelatedField(
+        read_only=True, slug_field="name"
+    )
 
 
 class TrainDetailSerializer(TrainSerializer):
@@ -78,7 +80,10 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteListSerializer(RouteSerializer):
     source = serializers.SlugRelatedField(slug_field="name", read_only=True)
-    destination = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    destination = serializers.SlugRelatedField(
+        slug_field="name",
+        read_only=True
+    )
 
 
 class RouteDetailSerializer(RouteSerializer):
